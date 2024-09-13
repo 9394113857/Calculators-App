@@ -1,0 +1,32 @@
+# Python bytecode files
+*.pyc
+*.pyo
+__pycache__/
+
+# Environment files
+.env
+flask-project-env/
+
+# Flask specific files
+instance/
+
+# Database files
+*.sqlite3
+*.db
+
+# Configuration files
+config.py
+
+# IDE specific files
+.vscode/
+.idea/
+
+# Log files
+*.log
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# OS-specific files
+.DS_Store
+Thumbs.db

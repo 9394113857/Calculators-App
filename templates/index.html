@@ -1,0 +1,100 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Interest Calculator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .disabled {
+            background-color: #f0f0f0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Simple Interest Calculator</h1>
+
+        <form action="/" method="POST" id="interestForm">
+            <label for="principal">Principal:</label>
+            <input type="number" name="principal" placeholder="Enter principal amount" 
+                   value="{{ result.principal if result else '' }}" required 
+                   class="{% if not show_form %}disabled{% endif %}"><br><br>
+
+            <label for="rate">Rate (%):</label>
+            <input type="number" name="rate" placeholder="Enter rate of interest" 
+                   value="{{ result.rate if result else '' }}" required 
+                   class="{% if not show_form %}disabled{% endif %}"><br><br>
+
+            <label for="time">Time (years):</label>
+            <input type="number" name="time" placeholder="Enter time period" 
+                   value="{{ result.time if result else '' }}" required 
+                   class="{% if not show_form %}disabled{% endif %}"><br><br>
+
+            <label for="start_date">Start Date:</label>
+            <input type="date" name="start_date" value="{{ result.start_date if result else '' }}" required 
+                   class="{% if not show_form %}disabled{% endif %}"><br><br>
+
+            {% if not result %}
+                <!-- Fields shown only if result is not present (initial calculation) -->
+                <input type="submit" value="Calculate">
+            {% else %}
+                <!-- Additional fields for ongoing loan tracking -->
+                <label for="last_payment_date">Last Payment Date:</label>
+                <input type="date" name="last_payment_date" value="{{ result.last_payment_date if result else '' }}" 
+                       class="{% if not show_form %}disabled{% endif %}"><br><br>
+
+                <label for="end_date">End Date:</label>
+                <input type="date" name="end_date" value="{{ result.end_date if result else '' }}" 
+                       class="{% if not show_form %}disabled{% endif %}"><br><br>
+
+                <input type="submit" value="Calculate" disabled>
+                <p>Do you want to calculate again?</p>
+                <button id="yesButton">Yes</button>
+            {% endif %}
+        </form>
+
+        {% if result %}
+            <div class="result" id="resultSection">
+                <h2>Result:</h2>
+                <p><strong>Principal:</strong> {{ result.principal }}</p>
+                <p><strong>Rate:</strong> {{ result.rate }}%</p>
+                <p><strong>Time:</strong> {{ result.time }} years</p>
+                <p><strong>Total Interest:</strong> {{ result.total_interest }}</p>
+                <p><strong>Total Payment:</strong> {{ result.total_payment }}</p>
+
+                <h3>Monthly Breakdown:</h3>
+                <p><strong>Monthly Principal Payment:</strong> {{ result.monthly_principal }}</p>
+                <p><strong>Monthly Interest Payment:</strong> {{ result.monthly_interest }}</p>
+                <p><strong>Total Monthly Payment:</strong> {{ result.monthly_principal + result.monthly_interest }}</p>
+
+                {% if result.remaining_years is defined %}
+                    <h3>Remaining Time:</h3>
+                    <p><strong>Remaining Years:</strong> {{ result.remaining_years }}</p>
+                    <p><strong>Remaining Months:</strong> {{ result.remaining_months }}</p>
+
+                    <h3>Outstanding Balance:</h3>
+                    <p><strong>Outstanding Amount:</strong> {{ result.outstanding_amount }}</p>
+                {% endif %}
+
+                <p>Do you want to calculate again?</p>
+                <button id="yesButton">Yes</button>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // JavaScript to handle enabling fields and clearing the result section
+        document.getElementById('yesButton').addEventListener('click', function() {
+            var inputs = document.querySelectorAll('input[type="number"], input[type="date"]');
+            inputs.forEach(function(input) {
+                input.classList.remove('disabled');
+                input.value = '';
+            });
+            document.getElementById('interestForm').submit();
+        });
+    </script>
+</body>
+</html>

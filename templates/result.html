@@ -1,0 +1,22 @@
+<!-- templates/result.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Interest Result</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Simple Interest Result</h1>
+        <div class="result">
+            <p>Principal: {{ principal }}</p>
+            <p>Rate: {{ rate }}%</p>
+            <p>Time: {{ time }} years</p>
+            <p>Simple Interest: {{ interest }}</p>
+        </div>
+        <a href="/">Calculate Again</a>
+    </div>
+</body>
+</html>
