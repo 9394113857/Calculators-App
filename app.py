@@ -1,4 +1,3 @@
-# app.py
 from flask import Flask, render_template, request
 from datetime import datetime
 
@@ -40,6 +39,8 @@ def calculate_remaining_outstanding(principal, total_payment, last_payment_date,
 def index():
     result = None
     show_form = True
+    user_type = request.form.get('user_type')
+    
     if request.method == 'POST':
         # Extract form values
         principal = request.form.get('principal')
@@ -95,8 +96,9 @@ def index():
 
             # Disable form fields and show results
             show_form = False
+            print(f"Result: {result}")  # Debug print
 
-    return render_template('index.html', result=result, show_form=show_form)
+    return render_template('index.html', result=result, show_form=show_form, user_type=user_type)
 
 if __name__ == '__main__':
     app.run(debug=True)

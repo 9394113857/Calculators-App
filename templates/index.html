@@ -1,4 +1,3 @@
-<!-- templates/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,94 +6,192 @@
     <title>Simple Interest Calculator</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
+        /* Inline CSS for quick testing, replace this with your styles.css if needed */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background-color: white;
+            padding: 30px;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-top: 10px;
+            display: block;
+            text-align: left;
+        }
+
+        input[type="number"],
+        input[type="date"],
+        input[type="submit"],
+        button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        input[type="submit"],
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover,
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .result {
+            background-color: #e0f7fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .result p {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+
         .disabled {
             background-color: #f0f0f0;
             pointer-events: none;
         }
+
+        #resetButton {
+            background-color: #f44336;
+            color: white;
+        }
+
+        #resetButton:hover {
+            background-color: #d32f2f;
+        }
+
+        #yesButton {
+            background-color: #2196f3;
+            color: white;
+        }
+
+        #yesButton:hover {
+            background-color: #1976d2;
+        }
+
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
+    <!-- Main calculation container -->
     <div class="container">
+        <!-- Heading section -->
         <h1>Simple Interest Calculator</h1>
 
+        <!-- Interest calculation form -->
         <form action="/" method="POST" id="interestForm">
+            <label for="user_type">Are you a new or existing user?</label>
+            <input type="radio" name="user_type" value="new" id="newUser" required 
+                   {% if user_type == 'new' %}checked{% endif %}>
+            <label for="newUser">New User</label><br>
+            <input type="radio" name="user_type" value="existing" id="existingUser" required 
+                   {% if user_type == 'existing' %}checked{% endif %}>
+            <label for="existingUser">Existing User</label><br><br>
+
             <label for="principal">Principal:</label>
             <input type="number" name="principal" placeholder="Enter principal amount" 
-                   value="{{ result.principal if result else '' }}" required 
-                   class="{% if not show_form %}disabled{% endif %}"><br><br>
+                   value="{{ result.principal if result else '' }}" required min="1" 
+                   class="{% if not show_form %}disabled{% endif %}"><br>
 
             <label for="rate">Rate (%):</label>
             <input type="number" name="rate" placeholder="Enter rate of interest" 
-                   value="{{ result.rate if result else '' }}" required 
-                   class="{% if not show_form %}disabled{% endif %}"><br><br>
+                   value="{{ result.rate if result else '' }}" required min="0.01" step="0.01" 
+                   class="{% if not show_form %}disabled{% endif %}"><br>
 
             <label for="time">Time (years):</label>
             <input type="number" name="time" placeholder="Enter time period" 
-                   value="{{ result.time if result else '' }}" required 
-                   class="{% if not show_form %}disabled{% endif %}"><br><br>
+                   value="{{ result.time if result else '' }}" required min="1" 
+                   class="{% if not show_form %}disabled{% endif %}"><br>
 
             <label for="start_date">Start Date:</label>
-            <input type="date" name="start_date" value="{{ result.start_date if result else '' }}" required 
-                   class="{% if not show_form %}disabled{% endif %}"><br><br>
+            <input type="date" name="start_date" required 
+                   value="{{ result.start_date if result else '' }}" 
+                   class="{% if not show_form %}disabled{% endif %}"><br>
 
-            {% if not result %}
-                <!-- Fields shown only if result is not present (initial calculation) -->
-                <input type="submit" value="Calculate">
-            {% else %}
-                <!-- Additional fields for ongoing loan tracking -->
-                <label for="last_payment_date">Last Payment Date:</label>
-                <input type="date" name="last_payment_date" value="{{ result.last_payment_date if result else '' }}" 
-                       class="{% if not show_form %}disabled{% endif %}"><br><br>
+            {% if user_type == 'existing' %}
+            <label for="last_payment_date">Last Payment Date:</label>
+            <input type="date" name="last_payment_date" 
+                   value="{{ result.last_payment_date if result else '' }}" 
+                   class="{% if not show_form %}disabled{% endif %}"><br>
 
-                <label for="end_date">End Date:</label>
-                <input type="date" name="end_date" value="{{ result.end_date if result else '' }}" 
-                       class="{% if not show_form %}disabled{% endif %}"><br><br>
-
-                <input type="submit" value="Calculate" disabled>
-                <p>Do you want to calculate again?</p>
-                <button id="yesButton">Yes</button>
+            <label for="end_date">End Date:</label>
+            <input type="date" name="end_date" 
+                   value="{{ result.end_date if result else '' }}" 
+                   class="{% if not show_form %}disabled{% endif %}"><br>
             {% endif %}
+
+            <input type="submit" value="Calculate" 
+                   class="{% if not show_form %}hidden{% endif %}">
         </form>
 
+        <!-- Display results -->
         {% if result %}
-            <div class="result" id="resultSection">
-                <h2>Result:</h2>
-                <p><strong>Principal:</strong> {{ result.principal }}</p>
-                <p><strong>Rate:</strong> {{ result.rate }}%</p>
-                <p><strong>Time:</strong> {{ result.time }} years</p>
-                <p><strong>Total Interest:</strong> {{ result.total_interest }}</p>
-                <p><strong>Total Payment:</strong> {{ result.total_payment }}</p>
+        <div class="result">
+            <p><strong>Total Interest:</strong> {{ result.total_interest }}</p>
+            <p><strong>Total Payment:</strong> {{ result.total_payment }}</p>
+            <p><strong>Monthly Interest:</strong> {{ result.monthly_interest }}</p>
+            <p><strong>Monthly Principal:</strong> {{ result.monthly_principal }}</p>
+            
+            {% if user_type == 'existing' %}
+            <p><strong>Remaining Years:</strong> {{ result.remaining_years }}</p>
+            <p><strong>Remaining Months:</strong> {{ result.remaining_months }}</p>
+            <p><strong>Outstanding Amount:</strong> {{ result.outstanding_amount }}</p>
+            {% endif %}
 
-                <h3>Monthly Breakdown:</h3>
-                <p><strong>Monthly Principal Payment:</strong> {{ result.monthly_principal }}</p>
-                <p><strong>Monthly Interest Payment:</strong> {{ result.monthly_interest }}</p>
-                <p><strong>Total Monthly Payment:</strong> {{ result.monthly_principal + result.monthly_interest }}</p>
-
-                {% if result.remaining_years is defined %}
-                    <h3>Remaining Time:</h3>
-                    <p><strong>Remaining Years:</strong> {{ result.remaining_years }}</p>
-                    <p><strong>Remaining Months:</strong> {{ result.remaining_months }}</p>
-
-                    <h3>Outstanding Balance:</h3>
-                    <p><strong>Outstanding Amount:</strong> {{ result.outstanding_amount }}</p>
-                {% endif %}
-
-                <p>Do you want to calculate again?</p>
-                <button id="yesButton">Yes</button>
-            </div>
+            <button id="yesButton" onclick="handleYes()">Yes, Calculate Again</button>
+            <button id="resetButton" onclick="handleReset()">No, Reset Form</button>
+        </div>
         {% endif %}
     </div>
 
+    <!-- JavaScript for handling form reset -->
     <script>
-        // JavaScript to handle enabling fields and clearing the result section
-        document.getElementById('yesButton').addEventListener('click', function() {
-            var inputs = document.querySelectorAll('input[type="number"], input[type="date"]');
-            inputs.forEach(function(input) {
+        function handleYes() {
+            // Reload the page to reset the form
+            window.location.href = "/";
+        }
+
+        function handleReset() {
+            // Reset form by clearing input values
+            document.getElementById('interestForm').reset();
+            document.querySelectorAll('.disabled').forEach((input) => {
                 input.classList.remove('disabled');
-                input.value = '';
             });
-            document.getElementById('interestForm').submit();
-        });
+            document.querySelector('input[type="submit"]').classList.remove('hidden');
+        }
     </script>
 </body>
 </html>
